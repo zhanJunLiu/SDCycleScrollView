@@ -14,10 +14,10 @@ s.platform     = :ios
 s.platform     = :ios, "7.0"
 
 
-s.source       = { :git => 'https://github.com/zhanJunLiu/ZJCycleScrollView.git', :tag => s.version.to_s}
+s.source       = { :git => 'https://github.com/zhanJunLiu/ZJCycleScrollView.git', :tag => 1.77}
 
 
-s.source_files  = "SDCycleScrollView/Lib/SDCycleScrollView/**/*.{h，m}"
+s.source_files  = "SDCycleScrollView/Lib/SDCycleScrollView/**/*.{h,m}"
 
 
 s.requires_arc = true

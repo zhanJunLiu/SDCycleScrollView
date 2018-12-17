@@ -269,7 +269,8 @@ NSString * const ID = @"SDCycleScrollViewCell";
     [self invalidateTimer];
     
     if (_autoScroll) {
-        [self setupTimer];
+//        [self setupTimer];
+        [self performSelectorInBackground:@selector(setupTimer) withObject:nil];
     }
 }
 
@@ -366,11 +367,12 @@ NSString * const ID = @"SDCycleScrollViewCell";
 
 - (void)setupTimer
 {
-    [self invalidateTimer]; // 创建定时器前先停止定时器，不然会出现僵尸定时器，导致轮播频率错误
-    
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:self.autoScrollTimeInterval target:self selector:@selector(automaticScroll) userInfo:nil repeats:YES];
-    _timer = timer;
-    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    if (![NSThread isMainThread]) {
+        [self invalidateTimer]; // 创建定时器前先停止定时器，不然会出现僵尸定时器，导致轮播频率错误
+        NSTimer *timer = [NSTimer timerWithTimeInterval:self.autoScrollTimeInterval target:self selector:@selector(automaticScroll) userInfo:nil repeats:YES];
+        _timer = timer;
+        [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    }
 }
 
 - (void)invalidateTimer
@@ -431,10 +433,12 @@ NSString * const ID = @"SDCycleScrollViewCell";
 
 - (void)automaticScroll
 {
-    if (0 == _totalItemsCount) return;
-    int currentIndex = [self currentIndex];
-    int targetIndex = currentIndex + 1;
-    [self scrollToIndex:targetIndex];
+    dispatch_async_on_main_queue(^{
+        if (0 == _totalItemsCount) return;
+        int currentIndex = [self currentIndex];
+        int targetIndex = currentIndex + 1;
+        [self scrollToIndex:targetIndex];
+    })
 }
 
 - (void)scrollToIndex:(int)targetIndex
@@ -655,7 +659,8 @@ NSString * const ID = @"SDCycleScrollViewCell";
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     if (self.autoScroll) {
-        [self setupTimer];
+        [self performSelectorInBackground:@selector(setupTimer) withObject:nil];
+//        [self setupTimer];
     }
 }
 
@@ -686,7 +691,8 @@ NSString * const ID = @"SDCycleScrollViewCell";
     [self scrollToIndex:(int)(_totalItemsCount * 0.5 + index)];
     
     if (self.autoScroll) {
-        [self setupTimer];
+//        [self setupTimer];
+        [self performSelectorInBackground:@selector(setupTimer) withObject:nil];
     }
 }
 
