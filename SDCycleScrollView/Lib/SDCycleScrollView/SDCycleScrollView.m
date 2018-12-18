@@ -433,12 +433,14 @@ NSString * const ID = @"SDCycleScrollViewCell";
 
 - (void)automaticScroll
 {
-    dispatch_async_on_main_queue(^{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    dispatch_async(queue, ^{
         if (0 == _totalItemsCount) return;
         int currentIndex = [self currentIndex];
         int targetIndex = currentIndex + 1;
         [self scrollToIndex:targetIndex];
-    })
+    });
+    
 }
 
 - (void)scrollToIndex:(int)targetIndex
