@@ -31,6 +31,7 @@
 
 
 #import <UIKit/UIKit.h>
+#import "UIImageView+Extension.h"
 
 @interface SDCollectionViewCell : UICollectionViewCell
 

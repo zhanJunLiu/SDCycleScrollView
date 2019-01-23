@@ -592,16 +592,21 @@ NSString * const ID = @"SDCycleScrollViewCell";
     
     if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
         if ([imagePath hasPrefix:@"http"]) {
-            [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage];
+            [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+                cell.imageView.image = image;
+                [cell.imageView display:ImageDisplayModeBottom];
+            }];
         } else {
             UIImage *image = [UIImage imageNamed:imagePath];
             if (!image) {
                 image = [UIImage imageWithContentsOfFile:imagePath];
             }
             cell.imageView.image = image;
+            [cell.imageView display:ImageDisplayModeBottom];
         }
     } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
         cell.imageView.image = (UIImage *)imagePath;
+        [cell.imageView display:ImageDisplayModeBottom];
     }
     
     if (_titlesGroup.count && itemIndex < _titlesGroup.count) {
@@ -615,7 +620,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
         cell.titleLabelTextColor = self.titleLabelTextColor;
         cell.titleLabelTextFont = self.titleLabelTextFont;
         cell.hasConfigured = YES;
-        cell.imageView.contentMode = self.bannerImageViewContentMode;
+//        cell.imageView.contentMode = self.bannerImageViewContentMode;
         cell.clipsToBounds = YES;
         cell.onlyDisplayText = self.onlyDisplayText;
     }
