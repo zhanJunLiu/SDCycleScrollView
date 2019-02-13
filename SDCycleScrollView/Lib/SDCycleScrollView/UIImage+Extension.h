@@ -11,9 +11,6 @@
 typedef NS_OPTIONS(NSUInteger, ImageDisplayMode) {
     ImageDisplayModeTop = 1 << 0,
     ImageDisplayModeBottom = 1 << 1,
-    ImageDisplayModeLeft = 1 << 2,
-    ImageDisplayModeRight = 1 << 3,
-    ImageDisplayModeCenter = 1 << 4,
 };
 
 NS_ASSUME_NONNULL_BEGIN

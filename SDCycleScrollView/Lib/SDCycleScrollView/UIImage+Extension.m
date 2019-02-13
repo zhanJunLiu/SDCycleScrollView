@@ -15,73 +15,54 @@
     UIImage *temp = self;
     
     //若原图尺寸大于屏幕宽度，就先以屏幕宽度为基准对原图进行缩放
-    if (size.width > [UIScreen mainScreen].bounds.size.width) {
-        temp = [self scaleBaseWidth:[UIScreen mainScreen].bounds.size.width];
+    if (size.width > viewSize.width) {
+        CGRect scaledFrame = [self calculateScaledRectWithTargetSize:CGSizeMake(viewSize.width, 0)];
+        if (scaledFrame.size.height > viewSize.height) {
+            CGFloat targetFactor = viewSize.height / viewSize.width;
+            CGFloat modifiedHeight = targetFactor * size.width;
+            CGFloat cutHeight = size.height - modifiedHeight;
+            CGRect rect = CGRectZero;
+            rect.size = CGSizeMake(size.width, size.height - cutHeight);
+            UIGraphicsBeginImageContextWithOptions(rect.size, true, 0);
+            UIBezierPath *path = [UIBezierPath bezierPathWithRect:rect];
+            [path addClip];
+            if (mode & ImageDisplayModeTop) {
+                [self drawAtPoint:CGPointZero];
+            }
+            if (mode & ImageDisplayModeBottom) {
+                [self drawAtPoint:CGPointMake(0, -cutHeight)];
+            }
+            temp = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+        }
+        temp = [temp scaleToSize:CGSizeMake(viewSize.width, 0)];
     }
-    size = temp.size;
-    // 首先确定按照给定尺寸进行缩放后的缩放系数
-    CGFloat imageScale = MIN(size.width / viewSize.width, size.height / viewSize.height);
-    // 新图片的宽度等于给定宽度除以缩放系数
-    CGFloat width = viewSize.width / imageScale;
-    // 新图片的高度等于给定高度除以缩放系数
-    CGFloat height = viewSize.height / imageScale;
-    // 由显示模式确定裁剪的纵轴位置
-    CGFloat x = 0;
-    CGFloat y = 0;
-    if (mode & ImageDisplayModeCenter) {
-        x = (size.width - width) / 2;
-        y = (size.height - height) / 2;
-    }
-    if (mode & ImageDisplayModeLeft) {
-        x = 0;
-    }
-    if (mode & ImageDisplayModeRight) {
-        x = size.width - width;
-    }
-    if (mode & ImageDisplayModeTop) {
-        y = 0;
-    }
-    if (mode & ImageDisplayModeBottom) {
-        y = size.height - height;
-    }
-    
-    CGRect rect = CGRectMake(x, y, width, height);
-    
-    CGImageRef sourceImageRef = [temp CGImage];
-    CGImageRef newImageRef = CGImageCreateWithImageInRect(sourceImageRef, rect);
-    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
-    return newImage;
+    return temp;
 }
 
-- (UIImage *)scaleBaseWidth:(CGFloat)width {
+- (CGRect)calculateScaledRectWithTargetSize:(CGSize)targetSize {
     CGSize imageSize = self.size;
-    CGFloat targetHeight = imageSize.height / (imageSize.width / width);
-    CGSize size = CGSizeMake(width, targetHeight);
-    CGFloat factor = 0;
-    CGFloat scaledWidth = width;
-    CGFloat scaledHeight = targetHeight;
-    CGPoint point = CGPointZero;
-    if (!CGSizeEqualToSize(imageSize, size)) {
-        CGFloat widthFactor = width / imageSize.width;
-        CGFloat heightFactor = targetHeight / imageSize.height;
-        factor = fmax(widthFactor, heightFactor);
-        scaledWidth = imageSize.width * factor;
-        scaledHeight = imageSize.height * factor;
-        if (widthFactor > heightFactor) {
-            point.y = (targetHeight - scaledHeight) * 0.5;
-        } else if (widthFactor < heightFactor) {
-            point.x = (width - scaledWidth) * 0.5;
-        }
+    CGFloat targetWidth = targetSize.width;
+    CGFloat targetHeight = targetSize.height;
+    if (targetHeight == 0) {
+        targetHeight = imageSize.height / (imageSize.width / targetWidth);
     }
-    UIGraphicsBeginImageContext(size);
+    if (targetWidth == 0) {
+        targetWidth = imageSize.width / (imageSize.height / targetHeight);
+    }
     CGRect rect = CGRectZero;
-    rect.origin = point;
-    rect.size.width = scaledWidth;
-    rect.size.height = scaledHeight;
+    rect.size = CGSizeMake(targetWidth, targetHeight);
+    return rect;
+}
+
+- (UIImage *)scaleToSize:(CGSize)size {
+    CGRect rect = [self calculateScaledRectWithTargetSize:size];
+    UIGraphicsBeginImageContextWithOptions(rect.size, true, 0);
     [self drawInRect:rect];
     UIImage *temp = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return temp;
+    
 }
 
 @end
