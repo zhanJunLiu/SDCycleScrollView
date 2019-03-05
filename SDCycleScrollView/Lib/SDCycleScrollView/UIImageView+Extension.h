@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIImageView (Extension)
 
-- (void)display:(ImageDisplayMode)mode;
+- (UIImage *)display:(ImageDisplayMode)mode;
 
 @end
 

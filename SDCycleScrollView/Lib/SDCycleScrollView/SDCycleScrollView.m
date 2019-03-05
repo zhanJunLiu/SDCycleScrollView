@@ -35,6 +35,8 @@
 #import "TAPageControl.h"
 #import "SDWebImageManager.h"
 #import "UIImageView+WebCache.h"
+#include <CommonCrypto/CommonCrypto.h>
+#include <zlib.h>
 
 #define kCycleScrollViewInitialPageControlDotSize CGSizeMake(10, 10)
 
@@ -372,6 +374,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
         NSTimer *timer = [NSTimer timerWithTimeInterval:self.autoScrollTimeInterval target:self selector:@selector(automaticScroll) userInfo:nil repeats:YES];
         _timer = timer;
         [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+        [[NSRunLoop currentRunLoop] run];
     }
 }
 
@@ -554,6 +557,22 @@ NSString * const ID = @"SDCycleScrollViewCell";
     _mainView.dataSource = nil;
 }
 
+// MARK: —————————— MD5 ——————————
+/*
+ * 功能 ： MD5
+ * 参数 : inputString : 输入字符串
+ * return : 返回MD5后的字符串
+ */
+- (NSString *)aliyun_MD5:(NSString *)inputString {
+    const char *cStr = [inputString UTF8String];
+    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5( cStr, (CC_LONG)strlen(cStr), digest ); // This is the md5 call
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
+        [output appendFormat:@"%02x", digest[i]];
+    return  output;
+}
+
 #pragma mark - public actions
 
 - (void)adjustWhenControllerViewWillAppera
@@ -590,23 +609,62 @@ NSString * const ID = @"SDCycleScrollViewCell";
     
     NSString *imagePath = self.imagePathsGroup[itemIndex];
     
+    NSString *imgPath = [imagePath stringByDeletingPathExtension];
+    NSString *suffix = [imagePath pathExtension];
+    NSString *md5ImgPath = [self aliyun_MD5:imgPath];
+    NSData *imgData = [[SDWebImageManager sharedManager].imageCache diskImageDataForKey:md5ImgPath];
+    
     if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
         if ([imagePath hasPrefix:@"http"]) {
             [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-                cell.imageView.image = image;
-                [cell.imageView display:ImageDisplayModeBottom];
+                
+                /** 缓存轮播图 */
+                if (imgData) {
+                    UIImage *img = [UIImage imageWithData:imgData];
+                    cell.imageView.image = img;
+                } else {
+                    UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
+                    NSData *imgData = UIImagePNGRepresentation(image_);
+                    [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
+                    cell.imageView.image = image_;
+                }
             }];
         } else {
             UIImage *image = [UIImage imageNamed:imagePath];
             if (!image) {
                 image = [UIImage imageWithContentsOfFile:imagePath];
             }
-            cell.imageView.image = image;
-            [cell.imageView display:ImageDisplayModeBottom];
+            
+            /** 缓存轮播图 */
+            if (imgData) {
+                UIImage *img = [UIImage imageWithData:imgData];
+                cell.imageView.image = img;
+            } else {
+                UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
+                NSData *imgData = UIImagePNGRepresentation(image_);
+                [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
+                cell.imageView.image = image_;
+            }
+            
+            //            cell.imageView.image = image;
+            //            [cell.imageView display:ImageDisplayModeBottom];
         }
     } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
-        cell.imageView.image = (UIImage *)imagePath;
-        [cell.imageView display:ImageDisplayModeBottom];
+        
+        /** 缓存轮播图 */
+        UIImage *image = (UIImage *)imagePath;
+        if (imgData) {
+            UIImage *img = [UIImage imageWithData:imgData];
+            cell.imageView.image = img;
+        } else {
+            UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
+            NSData *imgData = UIImagePNGRepresentation(image_);
+            [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
+            cell.imageView.image = image_;
+            
+            //        cell.imageView.image = (UIImage *)imagePath;
+            //        [cell.imageView display:ImageDisplayModeBottom];
+        }
     }
     
     if (_titlesGroup.count && itemIndex < _titlesGroup.count) {

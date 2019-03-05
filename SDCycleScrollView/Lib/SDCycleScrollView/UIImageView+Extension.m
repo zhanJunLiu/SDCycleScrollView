@@ -10,8 +10,8 @@
 
 @implementation UIImageView (Extension)
 
-- (void)display:(ImageDisplayMode)mode {
-    self.image = [self.image cutWithViewSize:self.frame.size mode:mode];
+- (UIImage *)display:(ImageDisplayMode)mode {
+    return [self.image cutWithViewSize:self.frame.size mode:mode];
 }
 
 @end
