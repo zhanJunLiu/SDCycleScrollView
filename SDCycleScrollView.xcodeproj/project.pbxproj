@@ -121,17 +121,9 @@
 		48377B8A1C10265E007B8C21 /* DemoVC */ = {
 			isa = PBXGroup;
 			children = (
-				48377B8B1C102758007B8C21 /* 纯代码demo */,
 				48377B8C1C102758007B8C21 /* xib的demo */,
 			);
 			path = DemoVC;
-			sourceTree = "<group>";
-		};
-		48377B8B1C102758007B8C21 /* 纯代码demo */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "纯代码demo";
 			sourceTree = "<group>";
 		};
 		48377B8C1C102758007B8C21 /* xib的demo */ = {
