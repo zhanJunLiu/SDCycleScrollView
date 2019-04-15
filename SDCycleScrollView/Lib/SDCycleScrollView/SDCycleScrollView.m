@@ -54,6 +54,8 @@ NSString * const ID = @"SDCycleScrollViewCell";
 
 @property (nonatomic, strong) UIImageView *backgroundImageView; // 当imageURLs为空时的背景图
 
+@property (nonatomic, strong) NSArray *imageSuffixs;
+
 @end
 
 @implementation SDCycleScrollView
@@ -74,8 +76,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
     [self setupMainView];
 }
 
-- (void)initialization
-{
+- (void)initialization {
     _pageControlAliment = SDCycleScrollViewPageContolAlimentCenter;
     _autoScrollTimeInterval = 2.0;
     _titleLabelTextColor = [UIColor whiteColor];
@@ -94,7 +95,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
     _currentPageDotColor = [UIColor whiteColor];
     _pageDotColor = [UIColor lightGrayColor];
     _bannerImageViewContentMode = UIViewContentModeScaleToFill;
-    
+    _imageSuffixs = @[@"png", @"jpg", @"jpeg", @"gif", @"bmp"];
     self.backgroundColor = [UIColor lightGrayColor];
     
 }
@@ -608,69 +609,43 @@ NSString * const ID = @"SDCycleScrollViewCell";
     }
     
     NSString *imagePath = self.imagePathsGroup[itemIndex];
-    
-    NSString *imgPath = [imagePath stringByDeletingPathExtension];
     NSString *suffix = [imagePath pathExtension];
-    NSString *md5ImgPath = [self aliyun_MD5:imgPath];
-    NSData *imgData = [[SDWebImageManager sharedManager].imageCache diskImageDataForKey:md5ImgPath];
     
     
-    if (![imagePath isEqualToString:@""]) {
-        
-        if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
-            if ([imagePath hasPrefix:@"http"]) {
-                [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-                    
-                    /** 缓存轮播图 */
-                    if (imgData) {
-                        UIImage *img = [UIImage imageWithData:imgData];
-                        cell.imageView.image = img;
-                    } else {
-                        UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
-                        NSData *imgData = UIImagePNGRepresentation(image_);
-                        [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
-                        cell.imageView.image = image_;
-                    }
-                }];
+    // 是否是字符串
+    if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
+        // 校验是否为图片链接
+        if ([self isValidUrl:imagePath] && [self.imageSuffixs containsObject:suffix]) {
+            
+            [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage: self.placeholderImage];
+            
+//            if (imgData) {
+//                UIImage *img = [UIImage imageWithData:imgData];
+//                cell.imageView.image = img;
+//            } else {
+//                [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//
+//                    UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
+//                    NSData *imgData = UIImagePNGRepresentation(image_);
+//                    [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
+//                    cell.imageView.image = image_;
+//                }];
+//            }
+            
+        } else {
+            // 如果imagePath为空，就展示占位图片
+            if ([imagePath isEqualToString:@""]) {
+                cell.imageView.image = self.placeholderImage;
             } else {
                 UIImage *image = [UIImage imageNamed:imagePath];
                 if (!image) {
                     image = [UIImage imageWithContentsOfFile:imagePath];
                 }
-                
-                /** 缓存轮播图 */
-                if (imgData) {
-                    UIImage *img = [UIImage imageWithData:imgData];
-                    cell.imageView.image = img;
-                } else {
-                    UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
-                    NSData *imgData = UIImagePNGRepresentation(image_);
-                    [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
-                    cell.imageView.image = image_;
-                }
-                
-                //            cell.imageView.image = image;
-                //            [cell.imageView display:ImageDisplayModeBottom];
-            }
-        } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
-            
-            /** 缓存轮播图 */
-            UIImage *image = (UIImage *)imagePath;
-            if (imgData) {
-                UIImage *img = [UIImage imageWithData:imgData];
-                cell.imageView.image = img;
-            } else {
-                UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
-                NSData *imgData = UIImagePNGRepresentation(image_);
-                [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
-                cell.imageView.image = image_;
-                
-                //        cell.imageView.image = (UIImage *)imagePath;
-                //        [cell.imageView display:ImageDisplayModeBottom];
+                cell.imageView.image = image;
             }
         }
-    } else {
-        cell.imageView.image = self.placeholderImage;
+    } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
+        cell.imageView.image = (UIImage *)imagePath;
     }
     
     if (_titlesGroup.count && itemIndex < _titlesGroup.count) {
@@ -684,7 +659,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
         cell.titleLabelTextColor = self.titleLabelTextColor;
         cell.titleLabelTextFont = self.titleLabelTextFont;
         cell.hasConfigured = YES;
-//        cell.imageView.contentMode = self.bannerImageViewContentMode;
+        //        cell.imageView.contentMode = self.bannerImageViewContentMode;
         cell.clipsToBounds = YES;
         cell.onlyDisplayText = self.onlyDisplayText;
     }
@@ -702,6 +677,17 @@ NSString * const ID = @"SDCycleScrollViewCell";
     }
 }
 
+- (BOOL)isValidUrl:(NSString *)url {
+    NSString *regex = @"[a-zA-z]+://[^\\s]*";
+    NSPredicate *urlTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex];
+    return [urlTest evaluateWithObject:url];
+}
+
+- (BOOL)isValidImageUrl:(NSString *)url {
+    NSString *regex = @"^.*?\.([j,J][p,P][g,G]|[j,J][p,P][e,E][g,G]|[b,B][m,M][p,P]|[g,G][i,I][f,F])$";
+    NSPredicate *urlTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex];
+    return [urlTest evaluateWithObject:url];
+}
 
 #pragma mark - UIScrollViewDelegate
 
