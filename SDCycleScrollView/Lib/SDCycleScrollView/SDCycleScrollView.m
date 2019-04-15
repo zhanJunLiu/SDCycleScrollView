@@ -614,9 +614,29 @@ NSString * const ID = @"SDCycleScrollViewCell";
     NSString *md5ImgPath = [self aliyun_MD5:imgPath];
     NSData *imgData = [[SDWebImageManager sharedManager].imageCache diskImageDataForKey:md5ImgPath];
     
-    if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
-        if ([imagePath hasPrefix:@"http"]) {
-            [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+    
+    if (![imagePath isEqualToString:@""]) {
+        
+        if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
+            if ([imagePath hasPrefix:@"http"]) {
+                [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+                    
+                    /** 缓存轮播图 */
+                    if (imgData) {
+                        UIImage *img = [UIImage imageWithData:imgData];
+                        cell.imageView.image = img;
+                    } else {
+                        UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
+                        NSData *imgData = UIImagePNGRepresentation(image_);
+                        [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
+                        cell.imageView.image = image_;
+                    }
+                }];
+            } else {
+                UIImage *image = [UIImage imageNamed:imagePath];
+                if (!image) {
+                    image = [UIImage imageWithContentsOfFile:imagePath];
+                }
                 
                 /** 缓存轮播图 */
                 if (imgData) {
@@ -628,14 +648,14 @@ NSString * const ID = @"SDCycleScrollViewCell";
                     [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
                     cell.imageView.image = image_;
                 }
-            }];
-        } else {
-            UIImage *image = [UIImage imageNamed:imagePath];
-            if (!image) {
-                image = [UIImage imageWithContentsOfFile:imagePath];
+                
+                //            cell.imageView.image = image;
+                //            [cell.imageView display:ImageDisplayModeBottom];
             }
+        } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
             
             /** 缓存轮播图 */
+            UIImage *image = (UIImage *)imagePath;
             if (imgData) {
                 UIImage *img = [UIImage imageWithData:imgData];
                 cell.imageView.image = img;
@@ -644,27 +664,13 @@ NSString * const ID = @"SDCycleScrollViewCell";
                 NSData *imgData = UIImagePNGRepresentation(image_);
                 [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
                 cell.imageView.image = image_;
+                
+                //        cell.imageView.image = (UIImage *)imagePath;
+                //        [cell.imageView display:ImageDisplayModeBottom];
             }
-            
-            //            cell.imageView.image = image;
-            //            [cell.imageView display:ImageDisplayModeBottom];
         }
-    } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
-        
-        /** 缓存轮播图 */
-        UIImage *image = (UIImage *)imagePath;
-        if (imgData) {
-            UIImage *img = [UIImage imageWithData:imgData];
-            cell.imageView.image = img;
-        } else {
-            UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
-            NSData *imgData = UIImagePNGRepresentation(image_);
-            [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
-            cell.imageView.image = image_;
-            
-            //        cell.imageView.image = (UIImage *)imagePath;
-            //        [cell.imageView display:ImageDisplayModeBottom];
-        }
+    } else {
+        cell.imageView.image = self.placeholderImage;
     }
     
     if (_titlesGroup.count && itemIndex < _titlesGroup.count) {
@@ -704,6 +710,19 @@ NSString * const ID = @"SDCycleScrollViewCell";
     if (!self.imagePathsGroup.count) return; // 解决清除timer时偶尔会出现的问题
     int itemIndex = [self currentIndex];
     int indexOnPageControl = [self pageControlIndexWithCurrentCellIndex:itemIndex];
+    
+    CGFloat totalImagewidth = self.bounds.size.width * self.imagePathsGroup.count;
+    CGFloat currentOffset = _mainView.contentOffset.x - self.bounds.size.width * 50 * self.imagePathsGroup.count;
+    CGFloat realOffset;
+    if (currentOffset > 0) {
+        realOffset = (int)currentOffset % (int)totalImagewidth;
+    } else {
+        realOffset = (int)currentOffset % (int)totalImagewidth + totalImagewidth;
+    }
+    
+    if (self.cycleScrollViewBlock) {
+        self.cycleScrollViewBlock((int)realOffset);
+    }
     
     if ([self.pageControl isKindOfClass:[TAPageControl class]]) {
         TAPageControl *pageControl = (TAPageControl *)_pageControl;
