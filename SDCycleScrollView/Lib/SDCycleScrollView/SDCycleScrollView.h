@@ -140,6 +140,38 @@ typedef enum {
 /** 解决viewWillAppear时出现时轮播图卡在一半的问题，在控制器viewWillAppear时调用此方法 */
 - (void)adjustWhenControllerViewWillAppera;
 
+/**
+ 根据imageUrl加密拼接 Store key
+ 
+ @param imageUrl 需要加密的url
+ @return 加密后的字符串
+ */
+- (NSString *)fetchStoreKeyWithImageURL:(NSString *)imageUrl;
+
+/**
+ 根据imageUrl获取sdwebimage存储的值
+ 
+ @param imageUrl 查询条件的url
+ @return 返回查询到的NSData类型数据
+ */
+- (NSData *)fetchDiskDataWithImageURL:(NSString *)imageUrl;
+
+/**
+ 根据imageUrl存储image的color到本地， 调用SDWebImage中存储函数
+ 
+ @param image 存储color的image
+ @param imageUrl 存储条件
+ */
+- (void)storeImageColorInfoWithImageURL:(NSString *)imageUrl;
+
+/**
+ 获取image的颜色值
+ 
+ @param image 需要获取颜色的image
+ @param completedHandler image主题颜色返回结果
+ */
+- (void)fetchMainColorValueWithImage:(UIImage *)image completedHandler:(void(^)(NSString *colorString))completedHandler;
+
 //////////////////////  自定义样式API  //////////////////////
 
 /** 轮播图片的ContentMode，默认为 UIViewContentModeScaleToFill */

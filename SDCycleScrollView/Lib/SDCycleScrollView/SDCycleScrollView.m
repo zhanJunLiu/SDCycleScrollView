@@ -38,6 +38,10 @@
 #include <CommonCrypto/CommonCrypto.h>
 #include <zlib.h>
 
+#import "UIImage+Palette.h"
+#import "PaletteTarget.h"
+#import "PaletteColorModel.h"
+
 #define kCycleScrollViewInitialPageControlDotSize CGSizeMake(10, 10)
 
 NSString * const ID = @"SDCycleScrollViewCell";
@@ -475,25 +479,22 @@ NSString * const ID = @"SDCycleScrollViewCell";
     return MAX(0, index);
 }
 
-- (int)pageControlIndexWithCurrentCellIndex:(NSInteger)index
-{
+- (int)pageControlIndexWithCurrentCellIndex:(NSInteger)index {
     return (int)index % self.imagePathsGroup.count;
 }
 
-- (void)clearCache
-{
+- (void)clearCache {
     [[self class] clearImagesCache];
 }
 
-+ (void)clearImagesCache
-{
++ (void)clearImagesCache {
     [[[SDWebImageManager sharedManager] imageCache] clearDiskOnCompletion:nil];
 }
 
 #pragma mark - life circles
 
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
+    
     self.delegate = self.delegate;
     
     [super layoutSubviews];
@@ -541,12 +542,10 @@ NSString * const ID = @"SDCycleScrollViewCell";
     if (self.backgroundImageView) {
         self.backgroundImageView.frame = self.bounds;
     }
-    
 }
 
 //解决当父View释放时，当前视图因为被Timer强引用而不能释放的问题
-- (void)willMoveToSuperview:(UIView *)newSuperview
-{
+- (void)willMoveToSuperview:(UIView *)newSuperview {
     if (!newSuperview) {
         [self invalidateTimer];
     }
@@ -558,7 +557,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
     _mainView.dataSource = nil;
 }
 
-// MARK: —————————— MD5 ——————————
+// MARK: — MD5 Store Key —
 /*
  * 功能 ： MD5
  * 参数 : inputString : 输入字符串
@@ -572,6 +571,71 @@ NSString * const ID = @"SDCycleScrollViewCell";
     for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
         [output appendFormat:@"%02x", digest[i]];
     return  output;
+}
+
+
+/**
+ 根据imageUrl加密拼接 Store key
+
+ @param imageUrl 需要加密的url
+ @return 加密后的字符串
+ */
+- (NSString *)fetchStoreKeyWithImageURL:(NSString *)imageUrl {
+    if (imageUrl == nil || imageUrl == NULL || [imageUrl isEqualToString:@""]) { return @""; }
+    NSString *imgPath = [imageUrl stringByDeletingPathExtension];
+    NSString *key = [self aliyun_MD5:imgPath];
+    return key;
+}
+
+/**
+ 根据imageUrl获取sdwebimage存储的值
+
+ @param imageUrl 查询条件的url
+ @return 返回查询到的NSData类型数据
+ */
+- (NSData *)fetchDiskDataWithImageURL:(NSString *)imageUrl {
+    NSString *key = [self fetchStoreKeyWithImageURL:imageUrl];
+    NSData *imgCache = [[SDWebImageManager sharedManager].imageCache diskImageDataForKey:key];
+    return imgCache;
+}
+
+/**
+ 根据imageUrl存储image的color到本地， 调用sdwebimage中的函数
+
+ @param image 存储color的image
+ @param imageUrl 存储条件
+ */
+- (void)storeImageColorInfoWithImageURL:(NSString *)imageUrl {
+    if (imageUrl == nil || imageUrl == NULL) { return; }
+    
+    NSString *key = [self fetchStoreKeyWithImageURL:imageUrl];
+    
+    [[SDWebImageManager sharedManager] loadImageWithURL:[NSURL URLWithString:imageUrl] options:SDWebImageProgressiveDownload progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+        [self fetchMainColorValueWithImage:image completedHandler:^(NSString *colorString) {
+            NSData *value = [colorString dataUsingEncoding:NSUTF8StringEncoding];
+            [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:value forKey:key];
+        }];
+    }];
+}
+
+
+/**
+ 获取image的颜色值
+
+ @param image 需要获取颜色的image
+ @param completedHandler image主题颜色返回结果
+ */
+- (void)fetchMainColorValueWithImage:(UIImage *)image completedHandler:(void(^)(NSString *colorString))completedHandler {
+    CGImageRef sourceImageRef = [image CGImage];
+    CGFloat length = 30;
+    CGImageRef newImageRef = CGImageCreateWithImageInRect(sourceImageRef, CGRectMake(0, 0, length, length));
+    UIImage *newImage = [UIImage imageWithCGImage:newImageRef];
+    [newImage getPaletteImageColorWithMode:ALL_MODE_PALETTE withCallBack:^(PaletteColorModel *recommendColor, NSDictionary *allModeColorDic, NSError *error) {
+        if (recommendColor.imageColorString) {
+            NSString *imageColorStr = recommendColor.imageColorString;
+            completedHandler(imageColorStr);
+        }
+    }];
 }
 
 #pragma mark - public actions
@@ -611,32 +675,42 @@ NSString * const ID = @"SDCycleScrollViewCell";
     NSString *imagePath = self.imagePathsGroup[itemIndex];
     NSString *suffix = [imagePath pathExtension];
     
-    
     // 是否是字符串
     if (!self.onlyDisplayText && [imagePath isKindOfClass:[NSString class]]) {
+        
         // 校验是否为图片链接
         if ([self isValidUrl:imagePath] && [self.imageSuffixs containsObject:suffix]) {
             
-            [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage: self.placeholderImage];
+            NSData *imgCache = [self fetchDiskDataWithImageURL:imagePath];
             
-//            if (imgData) {
-//                UIImage *img = [UIImage imageWithData:imgData];
-//                cell.imageView.image = img;
-//            } else {
-//                [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage options:SDWebImageRetryFailed completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-//
-//                    UIImage *image_ = [cell.imageView display:ImageDisplayModeBottom];
-//                    NSData *imgData = UIImagePNGRepresentation(image_);
-//                    [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:imgData forKey:md5ImgPath];
-//                    cell.imageView.image = image_;
-//                }];
-//            }
+            [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage];
+//            [[SDWebImageManager sharedManager] loadImageWithURL:[NSURL URLWithString:imagePath] options:SDWebImageProgressiveDownload progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+//                NSLog(@"data = %g", image.size.height);
+//                cell.imageView.image = image;
+//            }];
+            
+            if (!imgCache) {
+                [self storeImageColorInfoWithImageURL:imagePath];
+            }
             
         } else {
+            
             // 如果imagePath为空，就展示占位图片
             if ([imagePath isEqualToString:@""]) {
+                
                 cell.imageView.image = self.placeholderImage;
+                
+                NSString *key_get = @"placeholderImage_key";
+                NSData *imgCache = [self fetchDiskDataWithImageURL:key_get];
+                if (!imgCache) {
+                    [self fetchMainColorValueWithImage:cell.imageView.image completedHandler:^(NSString *colorString) {
+                        NSString *key = [self fetchStoreKeyWithImageURL:key_get];
+                        NSData *value = [colorString dataUsingEncoding:NSUTF8StringEncoding];
+                        [[SDWebImageManager sharedManager].imageCache storeImageDataToDisk:value forKey:key];
+                    }];
+                }
             } else {
+                
                 UIImage *image = [UIImage imageNamed:imagePath];
                 if (!image) {
                     image = [UIImage imageWithContentsOfFile:imagePath];
@@ -644,6 +718,7 @@ NSString * const ID = @"SDCycleScrollViewCell";
                 cell.imageView.image = image;
             }
         }
+        
     } else if (!self.onlyDisplayText && [imagePath isKindOfClass:[UIImage class]]) {
         cell.imageView.image = (UIImage *)imagePath;
     }
