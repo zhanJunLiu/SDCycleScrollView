@@ -30,6 +30,8 @@
 
 #import <UIKit/UIKit.h>
 
+static UIImageView *suiyiView;
+
 @interface ViewController : UIViewController
 
 

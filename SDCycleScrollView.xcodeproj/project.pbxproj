@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05C6CDCF22656BCA003A9870 /* PaletteColorUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDC022656BCA003A9870 /* PaletteColorUtils.m */; };
+		05C6CDD022656BCA003A9870 /* Palette.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDC122656BCA003A9870 /* Palette.m */; };
+		05C6CDD122656BCA003A9870 /* PaletteSwatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDC222656BCA003A9870 /* PaletteSwatch.m */; };
+		05C6CDD222656BCA003A9870 /* UIImage+Palette.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDC422656BCA003A9870 /* UIImage+Palette.m */; };
+		05C6CDD322656BCA003A9870 /* PaletteColorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDCB22656BCA003A9870 /* PaletteColorModel.m */; };
+		05C6CDD422656BCA003A9870 /* PriorityBoxArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDCC22656BCA003A9870 /* PriorityBoxArray.m */; };
+		05C6CDD522656BCA003A9870 /* PaletteTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDCD22656BCA003A9870 /* PaletteTarget.m */; };
+		05C6CDD822656E83003A9870 /* UIColor+MyExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 05C6CDD622656E83003A9870 /* UIColor+MyExtension.m */; };
 		05CF42E121F866190047217E /* UIImageView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 05CF42E021F866190047217E /* UIImageView+Extension.m */; };
 		05CF42E421F866320047217E /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 05CF42E321F866320047217E /* UIImage+Extension.m */; };
 		48377B901C1027F5007B8C21 /* DemoVCWithXib.m in Sources */ = {isa = PBXBuildFile; fileRef = 48377B8E1C1027F5007B8C21 /* DemoVCWithXib.m */; };
@@ -49,6 +57,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		05C6CDC022656BCA003A9870 /* PaletteColorUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaletteColorUtils.m; sourceTree = "<group>"; };
+		05C6CDC122656BCA003A9870 /* Palette.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Palette.m; sourceTree = "<group>"; };
+		05C6CDC222656BCA003A9870 /* PaletteSwatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaletteSwatch.m; sourceTree = "<group>"; };
+		05C6CDC322656BCA003A9870 /* PriorityBoxArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PriorityBoxArray.h; sourceTree = "<group>"; };
+		05C6CDC422656BCA003A9870 /* UIImage+Palette.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Palette.m"; sourceTree = "<group>"; };
+		05C6CDC522656BCA003A9870 /* PaletteTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteTarget.h; sourceTree = "<group>"; };
+		05C6CDC622656BCA003A9870 /* PaletteSwatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteSwatch.h; sourceTree = "<group>"; };
+		05C6CDC722656BCA003A9870 /* Palette.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Palette.h; sourceTree = "<group>"; };
+		05C6CDC822656BCA003A9870 /* PaletteColorUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteColorUtils.h; sourceTree = "<group>"; };
+		05C6CDCA22656BCA003A9870 /* PaletteColorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PaletteColorModel.h; sourceTree = "<group>"; };
+		05C6CDCB22656BCA003A9870 /* PaletteColorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaletteColorModel.m; sourceTree = "<group>"; };
+		05C6CDCC22656BCA003A9870 /* PriorityBoxArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PriorityBoxArray.m; sourceTree = "<group>"; };
+		05C6CDCD22656BCA003A9870 /* PaletteTarget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PaletteTarget.m; sourceTree = "<group>"; };
+		05C6CDCE22656BCA003A9870 /* UIImage+Palette.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Palette.h"; sourceTree = "<group>"; };
+		05C6CDD622656E83003A9870 /* UIColor+MyExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+MyExtension.m"; sourceTree = "<group>"; };
+		05C6CDD722656E83003A9870 /* UIColor+MyExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+MyExtension.h"; sourceTree = "<group>"; };
 		05CF42DF21F866190047217E /* UIImageView+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Extension.h"; sourceTree = "<group>"; };
 		05CF42E021F866190047217E /* UIImageView+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Extension.m"; sourceTree = "<group>"; };
 		05CF42E221F866320047217E /* UIImage+Extension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Extension.h"; sourceTree = "<group>"; };
@@ -118,6 +142,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		05C6CDBF22656BCA003A9870 /* Palette */ = {
+			isa = PBXGroup;
+			children = (
+				05C6CDC022656BCA003A9870 /* PaletteColorUtils.m */,
+				05C6CDC122656BCA003A9870 /* Palette.m */,
+				05C6CDC222656BCA003A9870 /* PaletteSwatch.m */,
+				05C6CDC322656BCA003A9870 /* PriorityBoxArray.h */,
+				05C6CDC422656BCA003A9870 /* UIImage+Palette.m */,
+				05C6CDC522656BCA003A9870 /* PaletteTarget.h */,
+				05C6CDC622656BCA003A9870 /* PaletteSwatch.h */,
+				05C6CDC722656BCA003A9870 /* Palette.h */,
+				05C6CDC822656BCA003A9870 /* PaletteColorUtils.h */,
+				05C6CDC922656BCA003A9870 /* Model */,
+				05C6CDCC22656BCA003A9870 /* PriorityBoxArray.m */,
+				05C6CDCD22656BCA003A9870 /* PaletteTarget.m */,
+				05C6CDCE22656BCA003A9870 /* UIImage+Palette.h */,
+			);
+			path = Palette;
+			sourceTree = "<group>";
+		};
+		05C6CDC922656BCA003A9870 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05C6CDCA22656BCA003A9870 /* PaletteColorModel.h */,
+				05C6CDCB22656BCA003A9870 /* PaletteColorModel.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		48377B8A1C10265E007B8C21 /* DemoVC */ = {
 			isa = PBXGroup;
 			children = (
@@ -230,6 +283,9 @@
 		99E7B30A1AC11F1C009F9A2E /* SDCycleScrollView */ = {
 			isa = PBXGroup;
 			children = (
+				05C6CDBF22656BCA003A9870 /* Palette */,
+				05C6CDD722656E83003A9870 /* UIColor+MyExtension.h */,
+				05C6CDD622656E83003A9870 /* UIColor+MyExtension.m */,
 				990141051AC9420E00D0D74F /* SDCollectionViewCell.h */,
 				990141061AC9420E00D0D74F /* SDCollectionViewCell.m */,
 				990141071AC9420E00D0D74F /* SDCycleScrollView.h */,
@@ -404,18 +460,26 @@
 			files = (
 				9900D17A1ABEB2490077A6CB /* ViewController.m in Sources */,
 				05CF42E421F866320047217E /* UIImage+Extension.m in Sources */,
+				05C6CDCF22656BCA003A9870 /* PaletteColorUtils.m in Sources */,
+				05C6CDD022656BCA003A9870 /* Palette.m in Sources */,
 				990141031AC941FD00D0D74F /* TADotView.m in Sources */,
 				990141011AC941FD00D0D74F /* TAAbstractDotView.m in Sources */,
 				6BAA27FD1EFEA798008693AB /* CustomCollectionViewCell.m in Sources */,
 				990141021AC941FD00D0D74F /* TAAnimatedDotView.m in Sources */,
 				9901410D1AC9420E00D0D74F /* UIView+SDExtension.m in Sources */,
 				05CF42E121F866190047217E /* UIImageView+Extension.m in Sources */,
+				05C6CDD322656BCA003A9870 /* PaletteColorModel.m in Sources */,
+				05C6CDD522656BCA003A9870 /* PaletteTarget.m in Sources */,
+				05C6CDD422656BCA003A9870 /* PriorityBoxArray.m in Sources */,
 				9900D1771ABEB2490077A6CB /* AppDelegate.m in Sources */,
 				990141041AC941FD00D0D74F /* TAPageControl.m in Sources */,
+				05C6CDD122656BCA003A9870 /* PaletteSwatch.m in Sources */,
+				05C6CDD222656BCA003A9870 /* UIImage+Palette.m in Sources */,
 				48377B901C1027F5007B8C21 /* DemoVCWithXib.m in Sources */,
 				9900D1741ABEB2490077A6CB /* main.m in Sources */,
 				9901410B1AC9420E00D0D74F /* SDCollectionViewCell.m in Sources */,
 				9901410C1AC9420E00D0D74F /* SDCycleScrollView.m in Sources */,
+				05C6CDD822656E83003A9870 /* UIColor+MyExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
