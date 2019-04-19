@@ -36,7 +36,6 @@
 #import "SDWebImageManager.h"
 #import "UIImageView+WebCache.h"
 #include <CommonCrypto/CommonCrypto.h>
-#include <zlib.h>
 
 #import "UIImage+Palette.h"
 #import "PaletteTarget.h"
@@ -684,10 +683,6 @@ NSString * const ID = @"SDCycleScrollViewCell";
             NSData *imgCache = [self fetchDiskDataWithImageURL:imagePath];
             
             [cell.imageView sd_setImageWithURL:[NSURL URLWithString:imagePath] placeholderImage:self.placeholderImage];
-//            [[SDWebImageManager sharedManager] loadImageWithURL:[NSURL URLWithString:imagePath] options:SDWebImageProgressiveDownload progress:nil completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
-//                NSLog(@"data = %g", image.size.height);
-//                cell.imageView.image = image;
-//            }];
             
             if (!imgCache) {
                 [self storeImageColorInfoWithImageURL:imagePath];
